@@ -1,10 +1,13 @@
 // ==UserScript==
 // @name         LINE Sticker URL Copier
-// @namespace    http://tampermonkey.net/
-// @version      1.0
+// @namespace    https://github.com/jjjjackson/tamper-monkey-scripts
+// @version      1.0.0
 // @description  點擊 LINE 貼圖時複製貼圖 URL 到剪貼簿
-// @author       You
+// @author       jjjjackson
 // @match        https://store.line.me/stickershop/product*
+// @updateURL    https://raw.githubusercontent.com/jjjjackson/tamper-monkey-scripts/main/line-sticker-copier.user.js
+// @downloadURL  https://raw.githubusercontent.com/jjjjackson/tamper-monkey-scripts/main/line-sticker-copier.user.js
+// @homepageURL  https://github.com/jjjjackson/tamper-monkey-scripts
 // @grant        none
 // ==/UserScript==
 
@@ -90,7 +93,8 @@
         const rawUrl = getStickerUrlFromElement(target);
         if (rawUrl) {
             const url = stripUrlQuery(rawUrl);
-            copyToClipboard(url)
+            const imageTag=`<img src="${url}" alt="LINE Sticker">`;
+            copyToClipboard(imageTag)
                 .then(() => {
                     showToast('✓ 貼圖 URL 已複製到剪貼簿');
                 })
