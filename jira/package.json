@@ -1,0 +1,10 @@
+{
+  "name": "jira-create-task",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "create-task": "bun run src/cli.js",
+    "test": "bun test"
+  }
+}
