@@ -31,3 +31,47 @@ export function buildTaskPayload(input) {
   }
   return { fields };
 }
+
+export const TOKEN_RENEWAL_URL =
+  "https://id.atlassian.com/manage-profile/security/api-tokens";
+
+export class AuthExpiredError extends Error {
+  constructor() {
+    super(
+      "Authentication failed (401). Your Atlassian API token may have expired or been revoked.\n" +
+        "Atlassian API tokens expire within 1 year by default.\n" +
+        `Generate a new token at: ${TOKEN_RENEWAL_URL}\n` +
+        "Then update JIRA_EMAIL + JIRA_API_TOKEN environment variables.",
+    );
+    this.name = "AuthExpiredError";
+  }
+}
+
+/**
+ * POST the payload using an INJECTED transport so this stays auth-agnostic.
+ * @param {object} payload
+ * @param {{ request: (url:string, init:object)=>Promise<Response>, headers?:object }} opts
+ */
+export async function createTask(payload, opts = {}) {
+  const { request, headers = {} } = opts;
+  if (typeof request !== "function") {
+    throw new Error("createTask requires opts.request transport function");
+  }
+  const res = await request(`${SITE_BASE}/issue`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      ...headers,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (res.status === 401) throw new AuthExpiredError();
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Jira API error (${res.status}): ${body}`);
+  }
+  const data = await res.json();
+  return { key: data.key, url: `${BROWSE_BASE}/${data.key}` };
+}
