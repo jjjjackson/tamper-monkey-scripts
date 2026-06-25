@@ -37,6 +37,13 @@ describe("buildTaskPayload", () => {
   it("throws when summary is empty", () => {
     expect(() => buildTaskPayload({ summary: "" })).toThrow();
   });
+
+  it("never emits forbidden keys (description, customfield_10681, customfield_10810)", () => {
+    const p = buildTaskPayload({ summary: "S", description: "d", points: 1 });
+    expect(p.fields).not.toHaveProperty("description");
+    expect(p.fields).not.toHaveProperty("customfield_10681");
+    expect(p.fields).not.toHaveProperty("customfield_10810");
+  });
 });
 
 describe("createTask", () => {

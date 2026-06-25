@@ -25,4 +25,18 @@ describe("parseArgs", () => {
     const a = parseArgs(["--help"]);
     expect(a.help).toBe(true);
   });
+
+  it("throws when --points value is not a number", () => {
+    expect(() => parseArgs(["-s", "T", "-p", "abc"])).toThrow("--points must be a number");
+  });
+
+  it("throws when --points has no value (eats next flag)", () => {
+    expect(() => parseArgs(["--summary", "x", "--points", "--dry-run"])).toThrow(
+      "--points requires a value",
+    );
+  });
+
+  it("throws when -s has no value (eats next flag)", () => {
+    expect(() => parseArgs(["-s", "--dry-run"])).toThrow("-s requires a value");
+  });
 });

@@ -22,26 +22,43 @@ Env (required for real calls):
 
 export function parseArgs(argv) {
   const out = { dryRun: false };
+  const takeValue = (i, flagName) => {
+    const value = argv[i + 1];
+    if (value === undefined || value.startsWith("-")) {
+      throw new Error(`${flagName} requires a value`);
+    }
+    return value;
+  };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     switch (arg) {
       case "--summary":
       case "-s":
-        out.summary = argv[++i];
+        out.summary = takeValue(i, arg);
+        i++;
         break;
       case "--description":
       case "-d":
-        out.description = argv[++i];
+        out.description = takeValue(i, arg);
+        i++;
         break;
       case "--points":
-      case "-p":
-        out.points = Number(argv[++i]);
+      case "-p": {
+        const raw = takeValue(i, arg);
+        i++;
+        const num = Number(raw);
+        if (Number.isNaN(num)) {
+          throw new Error("--points must be a number");
+        }
+        out.points = num;
         break;
+      }
       case "--dry-run":
         out.dryRun = true;
         break;
       case "--json":
-        out.jsonOverride = JSON.parse(argv[++i]);
+        out.jsonOverride = JSON.parse(takeValue(i, arg));
+        i++;
         break;
       case "--help":
       case "-h":
