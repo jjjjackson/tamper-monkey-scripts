@@ -69,12 +69,7 @@
     }
 
     function copyToClipboard(text) {
-        try {
-            GM_setClipboard(text, { type: 'text', mimetype: 'text/plain' });
-            return Promise.resolve();
-        } catch (err) {
-            return Promise.reject(err);
-        }
+        GM_setClipboard(text, { type: 'text', mimetype: 'text/plain' });
     }
 
     function stripUrlQuery(url) {
